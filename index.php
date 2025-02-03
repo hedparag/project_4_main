@@ -1,2 +1,2 @@
 <?php echo "Initial page" ?>
-<h1>test5</h1>
+<h1>test7</h1>
