@@ -15,13 +15,13 @@ $dbconn = pg_connect($conn_string);
 $query = 'SELECT * FROM my_table';
 $result = pg_query($dbconn, $query);
 
-if (!$result) {
-    echo "An error occurred while querying the database.";
-    exit;
-} else {
-    echo "Query executed successfully.<br>";
+$data = array();
+while ($row = pg_fetch_assoc($result)) {
+    $data[] = $row;
 }
+echo "<pre>";
+print_r($data);
+echo "</pre>";
 
-print_r(pg_fetch_assoc($result));
 
 pg_close($dbconn);
