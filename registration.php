@@ -12,24 +12,24 @@ include 'includes/config.php';
     <title>Bootstrap demo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   </head>
-  <body>
+  <body class="bg-info-subtle">
     
-    <div class="container">
-        <h1>Registration</h1>
-        <form action="" method="POST">
+    <div class="container d-flex flex-column align-items-center">
+        <h1 class="text-danger mb-3 fw-bold">Fill Out The Registration Form</h1>
+        <form action="" method="POST" class="border-1 bg-info p-4">
         <div class="row">
             <div class="row">
                 <div class="col">
                     <div class="mb-3">
                         <label for="" class="form-label">Name</label>
-                        <input type="text" class="form-control"  name="fname"  id="" />  <small id="helpId" class="form-text text-muted">Help text</small>
+                        <input type="text" class="form-control"  name="fname"  id="" required>
                     </div>
                     
                 </div>
                 <div class="col">
                     <div class="mb-3">
-                        <label for="" class="form-label">Email</label>
-                        <input type="email" class="form-control"  name="email"  id="" />  <small id="helpId" class="form-text text-muted">Help text</small>
+                        <label for="mailcheck" class="form-label">Email</label>
+                        <input type="email" class="form-control"  name="email"  id="mailcheck" required>
                     </div>
                     
                 </div>
@@ -38,21 +38,21 @@ include 'includes/config.php';
                 <div class="col">
                     <div class="mb-3">
                         <label for="" class="form-label">Phone Number</label>
-                        <input type="phone" class="form-control"  name="phone"  id="" />  <small id="helpId" class="form-text text-muted">Help text</small>
+                        <input type="phone" class="form-control"  name="phone"  id="" required>
                     </div>
                     
                 </div>
                 <div class="col">
                     <div class="mb-3">
                         <label for="" class="form-label">Date Of Birth</label>
-                        <input type="date" class="form-control"  name="dob"  id="" />  <small id="helpId" class="form-text text-muted">Help text</small>
+                        <input type="date" class="form-control"  name="dob"  id="" required>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col">
                     <div class="mb-3">
                         <label for="" class="form-label">Upload Image From Here</label>
-                        <input type="file" class="form-control"  name="img"  id="" />  <small id="helpId" class="form-text text-muted">Help text</small>
+                        <input type="file" class="form-control"  name="img"  id="" required>
                     </div>
                     </div>
                 <div class="col">
@@ -116,16 +116,43 @@ include 'includes/config.php';
                     </div>
                     
                 </div>
+                <div class="col">
+                    <div class="mb-3">
+                        <div class="mb-3">
+                            <label for="skill" class="form-label">User Type</label>
+                            <select class="form-select" name="skill-type" id="skill" >
+                            <option>-- Select your skill --</option>
+                                <option value="Data Analysts">Data Analysts</option>
+                                <option value="Data Scientist">Data Scientist</option>
+                                <option value="Web developer">Web developer</option>
+                                <option value="Game Developer">Game Developer</option>
+                            </select>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
 
                 </div>
                 </div>
             </div>
         </div>
-        <input type="submit" value="Register" name="btn">
+        <div class="row">
+        <div class="form-floating">
+  <textarea class="form-control" placeholder="Enter your details from here..." id="floatingTextarea2" name="details" style="height: 100px"></textarea>
+  <label for="floatingTextarea2">Enter your details</label>
+</div>
+</div>
+<div class="row">
+    <div class="col justify-content-center">
+        <input type="submit" value="Register" name="btn" class="mt-4">
+        </div>
+        </div>
     </form>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  </body>
+<script src="jquery/reg.js"></script>  
+</body>
 </html>
 <?php
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btn'])) {
@@ -138,18 +165,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btn'])) {
     $department_id = $_POST['dept-type'];
     $position_id = $_POST['pos-type'];
     $img=$_POST['img'];
-
-    $query = "INSERT INTO employees(
-	user_type_id, department_id, position_id, employee_name, employee_email, employee_phone,dob,profile_image)
-	VALUES ( '$user_type_id', '$department_id', '$position_id', '$name', '$email', '$phone', '$dob','$img')";
-
-    $result = pg_query($dbconn, $query);
-
-    if ($result) {
-        echo "User registered successfully!";
-    } else {
-        echo "Error in registration: " . pg_last_error($dbconn);
+    $skill=$_POST['skill-type'];
+   $details=$_POST['details'];
+   $cond="SELECT * FROM employees WHERE employee_email='$email' OR employee_phone='$phone'";
+   $res=pg_query($dbconn,$cond);
+   $num=pg_num_rows($res);
+    if($num==0){
+        $query = "INSERT INTO employees(
+            user_type_id, department_id, position_id, employee_name, employee_email, employee_phone,dob,profile_image,skills,employee_details)
+            VALUES ( '$user_type_id', '$department_id', '$position_id', '$name', '$email', '$phone', '$dob','$img','$skill','$details')";
+        
+            $result = pg_query($dbconn, $query);
+        
+            if ($result) {
+                echo "User registered successfully!";
+            } else {
+                echo "Error in registration: " . pg_last_error($dbconn);
+            }
     }
+    else{
+        echo"record already exists";
+    }
+    
 }
 
 ?>
