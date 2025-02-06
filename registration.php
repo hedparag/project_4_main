@@ -160,6 +160,13 @@ $details=$_POST['details'];
                         <span class="error">* <?php echo $uploadErr; ?> </span> 
                     </div>
                     </div>
+                    <div class="col">
+                    <div class="mb-3">
+                        <label for="" class="form-label">Upload Image From Here</label>
+                        <input type="file" class="form-control"  name="img"  id=""value="<?= isset($_POST['img']) ? htmlspecialchars($_POST['img']) : '' ?>">
+                        <span class="error">* <?php echo $uploadErr; ?> </span> 
+                    </div>
+                    </div>
                 <div class="col">
                     <div class="mb-3">
                         <div class="mb-3">
