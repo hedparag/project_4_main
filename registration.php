@@ -2,8 +2,8 @@
 <?php
 include 'includes/config.php';
 // define variables to empty values  
-$nameErr = $emailErr = $mobilenoErr = $genderErr = $websiteErr = $agreeErr = "";  
-$name = $email = $mobileno = $gender = $website = $agree =$dobErr=$typeErr=$detailsErr=$skillErr=$uploadErr=$deptErr=$posErr= "";  
+$nameErr = $emailErr = $mobilenoErr = $genderErr = $websiteErr = $agreeErr =$imgPath = "";;  
+$name = $email = $mobileno = $gender= $website = $agree =$dobErr=$typeErr=$detailsErr=$skillErr=$uploadErr=$deptErr=$posErr= "";  
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Retrieve form data
     function input_data($data)
@@ -21,6 +21,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
    }
    else {  
     $dob = $_POST['dob'];   
+}
+if (empty($_POST['uname'])) {  
+    $usererr = "Username is required";  
+}
+else {  
+$uname = $_POST['uname'];   
+}
+if (empty($_POST['pass'])) {  
+    $passerr = "Password is required";  
+}
+else {  
+$pass = $_POST['pass'];   
 }
 if (empty($_POST['img'])) {  
     $uploadErr = "Upload the image";  
@@ -46,6 +58,31 @@ else {
         $emailErr = "Invalid email format";  
     }  
 }
+if (empty($_FILES['img']['name'])) {
+    $uploadErr = "Image is required";
+} else {
+    $allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+    $fileType = mime_content_type($_FILES['img']['tmp_name']);
+    $fileSize = $_FILES['img']['size'];
+    $maxFileSize = 2 * 1024 * 1024; // 2 MB
+    
+    // Check file type
+    if (!in_array($fileType, $allowedFileTypes)) {
+        $uploadErr = "Only JPG, JPEG, PNG, or GIF files are allowed.";
+    }
+    // Check file size
+    elseif ($fileSize > $maxFileSize) {
+        $uploadErr = "File size must be less than 2MB.";
+    } else {
+        // Save the image file to the server
+        $imgPath = "uploads/" . basename($_FILES['img']['name']);
+        if (move_uploaded_file($_FILES['img']['tmp_name'], $imgPath)) {
+            echo "Image uploaded successfully: " . $imgPath;
+        } else {
+            $uploadErr = "Error uploading the image.";
+        }
+    }
+}
 if (empty($_POST['phone'])) {  
     $mobilenoErr = "Mobile no is required";  
 } else {  
@@ -60,17 +97,12 @@ if (strlen ($phone) != 10) {
     }  
 } 
 $user_type_id = $_POST['admin-type'];
-/*if(isset($_POST['admin-type'])){
-    $admin="SELECT user_type FROM users WHERE user_type_id=$user_type_id";
-}
-else{
-    $admin='';
-}*/
 $department_id = $_POST['dept-type'];
 $position_id = $_POST['pos-type'];
 $img=$_POST['img'];
 $skill=$_POST['skill-type'];
 $details=$_POST['details'];
+//$password=$_POST['pass']
 //$details = isset($_POST['details']) ? $_POST['details'] : '';
 
 }
@@ -103,10 +135,13 @@ $details=$_POST['details'];
           <a class="nav-link active" aria-current="page" href="#" class="fw-bold ">Registration</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Admin</a>
+          <a class="nav-link" href="login.php">Admin</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">DashBoard</a>
+          <a class="nav-link" href="dashboard.php">DashBoard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="check.php">User</a>
         </li>
       </ul>
     </div>
@@ -115,7 +150,7 @@ $details=$_POST['details'];
     <div class="container d-flex flex-column align-items-center">
         <h1 class="text-danger mb-3 fw-bold">Fill Out The Registration Form</h1>
         <span class = "error">* marked fields required</span>  
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="border-1 bg-info p-4">
+        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="border-1 bg-info p-4"enctype="multipart/form-data">
         <div class="row">
             <div class="row">
                 <div class="col">
@@ -145,6 +180,13 @@ $details=$_POST['details'];
                     </div>
                     
                 </div>
+                <!--<div class="col">
+                    <div class="mb-3">
+                        <label for="" class="form-label">Enter Username</label>
+                        <input type="text" class="form-control"  name="uname"  id=""value="">
+                        <span class="error">* </span> 
+                    </div>
+                    </div>-->
                 <div class="col">
                     <div class="mb-3">
                         <label for="" class="form-label">Date Of Birth</label>
@@ -160,13 +202,13 @@ $details=$_POST['details'];
                         <span class="error">* <?php echo $uploadErr; ?> </span> 
                     </div>
                     </div>
-                    <div class="col">
+                   <!-- <div class="col">
                     <div class="mb-3">
-                        <label for="" class="form-label">Upload Image From Here</label>
-                        <input type="file" class="form-control"  name="img"  id=""value="<?= isset($_POST['img']) ? htmlspecialchars($_POST['img']) : '' ?>">
-                        <span class="error">* <?php echo $uploadErr; ?> </span> 
+                        <label for="" class="form-label">Enter Password</label>
+                        <input type="password" class="form-control"  name="pass"  id=""value="">
+                        <span class="error">* </span> 
                     </div>
-                    </div>
+                    </div>-->
                 <div class="col">
                     <div class="mb-3">
                         <div class="mb-3">
@@ -398,15 +440,19 @@ if (strlen ($phone) != 10) {
    if(isset($_POST['btn'])) { 
    if ($dobErr == "" && $nameErr == "" && 
    $emailErr == "" && $mobilenoErr == "") {
-   $cond="SELECT * FROM employees WHERE employee_email='$email' OR employee_phone='$phone'";
+   $cond="SELECT * FROM employees WHERE employee_email='$email' OR employee_phone='$phone';";
    $res=pg_query($dbconn,$cond);
    $num=pg_num_rows($res);
     if($num==0){
         $query = "INSERT INTO employees(
             user_type_id, department_id, position_id, employee_name, employee_email, employee_phone,dob,profile_image,skills,employee_details)
-            VALUES ( '$user_type_id', '$department_id', '$position_id', '$name', '$email', '$phone', '$dob','$img','$skill','$details')";
+            VALUES ( '$user_type_id', '$department_id', '$position_id', '$name', '$email', '$phone', '$dob','$img','$skill','$details');";
         
-            $result = pg_query($dbconn, $query);
+       //$query_sec="INSERT INTO users(
+	 //user_type_id, full_name, username, password)
+	//VALUES ('$user_type_id', '$name', '$uname', '$pass');"; 
+    //$result_sec=  pg_query($dbconn, $query_sec);
+        $result = pg_query($dbconn, $query);
         
             if ($result) {
                 echo "User registered successfully!";
