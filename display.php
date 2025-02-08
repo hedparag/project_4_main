@@ -1,3 +1,9 @@
+<?php
+session_start();
+if(!isset($_SESSION['uid'])){
+    header("Location:login.php");
+}
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -19,13 +25,22 @@
           <a class="nav-link" aria-current="page" href="registration.php" class="fw-bold ">Registration</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="login.php">Admin</a>
+          <a class="nav-link active" href="login.php">Login</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="dashboard.php">DashBoard</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="display.php">Admin Section</a>
+        </li>
+       <!-- <li class="nav-item">
           <a class="nav-link" href="check.php">User</a>
+        </li>-->
+       <!-- <li class="nav-item">
+          <a class="nav-link" href="user-login.php">User login</a>
+        </li>-->
+        <li class="nav-item">
+          <a class="nav-link" href="logout.php">Logout</a>
         </li>
       </ul>
     </div>
@@ -49,19 +64,21 @@ if($total>0){
         <th>Employee Date of Birth</th>
         <th>Action</th></tr>
         <?php
+        //htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8');
     while($rows=pg_fetch_assoc($res)){
-        echo"<tr><td>".$rows['employee_name']."</td>
-        <td>".$rows['employee_email']."</td>
-        <td>".$rows['employee_phone']."</td>
-        <td>".$rows['dob']."</td>
+      $_SESSION['employee_id'] = $rows['employee_id'];
+        echo"<tr><td>".htmlspecialchars($rows['employee_name'], ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($rows['employee_email'], ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($rows['employee_phone'], ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($rows['dob'], ENT_QUOTES, 'UTF-8')."</td>
         <td>
-                <a href='modification.php?id=" . $rows['employee_id'] . "'>
+                <a href='modification.php'>
                     <button type='button' class='btn btn-success'>Approve</button>
                 </a>
-                <a href='delete.php?id=" . $rows['employee_id'] . "'>
+                <a href='delete.php'>
                     <button type='button' class='btn btn-danger'>Delete</button>
                 </a>
-                <a href='details.php?id=" . $rows['employee_id'] . "'>
+                <a href='details.php'>
                     <button type='button' class='btn btn-primary'>Details</button>
                 </a>
             </td>

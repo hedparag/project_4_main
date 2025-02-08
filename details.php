@@ -1,3 +1,9 @@
+<?php
+session_start();
+if(!isset($_SESSION['uid'])){
+    header("Location:login.php");
+}
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -25,6 +31,9 @@
           <a class="nav-link" href="dashboard.php">DashBoard</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="display.php">Admin Section</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="check.php">User</a>
         </li>
       </ul>
@@ -36,25 +45,28 @@
 </html>
 <?php
 include 'includes/config.php';
-$id=$_GET['id'];
-$query="SELECT * FROM employees WHERE employee_id='$id';";
-$res=pg_query($dbconn,$query);
+//$id=$_GET['id'];
+$id = $_SESSION['employee_id'];
+$query="SELECT * FROM employees WHERE employee_id=$1;";
+$params=[$id];
+$res=pg_query_params($dbconn,$query,$params);
 $row=pg_fetch_assoc($res);
 
-$query_pos = "SELECT * FROM positions WHERE position_id='" . $row['position_id'] . "';";
-$res_pos=pg_query($dbconn,$query_pos);
+$query_pos = "SELECT * FROM positions WHERE position_id= $1;";
+$params_pos=[$row['position_id']];
+$res_pos=pg_query_params($dbconn,$query_pos,$params_pos);
 $result_pos=pg_fetch_assoc($res_pos);
 $position=$result_pos['position_name'];
 
-$query_dept = "SELECT * FROM departments WHERE department_id='" . $row['department_id'] . "';";
-
-$res_dept=pg_query($dbconn,$query_dept);
+$query_dept = "SELECT * FROM departments WHERE department_id=$1;";
+$params_dept=[$row['department_id']];
+$res_dept=pg_query_params($dbconn,$query_dept,$params_dept);
 $result_dept=pg_fetch_assoc($res_dept);
 $department=$result_dept['department_name'];
 
-$query_type = "SELECT * FROM user_types WHERE user_type_id='" . $row['user_type_id'] . "';";
-
-$res_type=pg_query($dbconn,$query_type);
+$query_type = "SELECT * FROM user_types WHERE user_type_id=$1;";
+$params_type=[$row['user_type_id']];
+$res_type=pg_query_params($dbconn,$query_type,$params_type);
 $result_type=pg_fetch_assoc($res_type);
 $type=$result_type['user_type'];
 
@@ -77,18 +89,18 @@ $type=$result_type['user_type'];
         <th>Department</th>
         <th>User Type</th></tr>
         <?php
-        echo"<tr><td>".$row['employee_name']."</td>
-        <td>".$row['employee_email']."</td>
-        <td>".$row['employee_phone']."</td>
-        <td>".$row['dob']."</td>
-        <td>".$row['employee_details']."</td>
-        <td>".$row['created_at']."</td>
-        <td>".$row['updated_at']."</td>
+        echo"<tr><td>".htmlspecialchars($row['employee_name'], ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($row['employee_email'], ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($row['employee_phone'], ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($row['dob'], ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($row['employee_details'], ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($row['created_at'], ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($row['updated_at'], ENT_QUOTES, 'UTF-8')."</td>
         <td> Not Approved</td>
-        <td>".$row['skills']."</td>
-        <td>".$position."</td>
-        <td>".$department."</td>
-        <td>".$type."</td>
+        <td>".htmlspecialchars($row['skills'], ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($position, ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($department, ENT_QUOTES, 'UTF-8')."</td>
+        <td>".htmlspecialchars($type, ENT_QUOTES, 'UTF-8')."</td>
           </tr>";
      
      ?></table>

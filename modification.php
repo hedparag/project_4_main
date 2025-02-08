@@ -1,10 +1,26 @@
 <?php
 include 'includes/config.php';
+session_start();
+if(!isset($_SESSION['uid'])){
+    header("Location:login.php");
+}
+function input_data($data)
+{
+    // trim() is used to remove any trailing whitespace
+    $data = trim($data);
+    // htmlspecialchars() is used to convert 
+      // special characters into their HTML entities
+    // Example - "&" -> "&amp"
+    $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+    return $data;
+}
 $passerr = "";
 $salerr="";
-$id = $_GET['id'];
-$query = "SELECT * FROM employees WHERE employee_id = '$id';";
-$res = pg_query($dbconn, $query);
+//$id = $_GET['id'];
+$id = $_SESSION['employee_id'];
+$query = "SELECT * FROM employees WHERE employee_id = $1;";
+$params=[$id];
+$res = pg_query_params($dbconn, $query,$params);
 $row = pg_fetch_assoc($res);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -14,13 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $salerr = "Please enter a valid positive numeric salary";  
     }  
     else {  
-        $sal = $_POST['sal'];   
+        $sal = input_data($_POST['sal']);   
     }
     if (empty($_POST['pass'])) {  
         $passerr = "Password is required";  
     } 
     else {  
-        $pass = $_POST['pass'];   
+        $pass = $_POST['pass'];
+        $hashedPassword = password_hash($pass, PASSWORD_BCRYPT);   
     }
 }
 ?>
@@ -28,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $alertMessage = '';
 $alertType = '';
 if(isset($_POST['btn'])){
-    if($salerr==""){
+    if($salerr=="" && $passerr==""){
         //$pass=$_POST['pass'];
         //$pass=bin2hex(random_bytes(6));
        // $hashedPassword = password_hash($pass, PASSWORD_BCRYPT);
@@ -39,13 +56,17 @@ if(isset($_POST['btn'])){
         $salary=$_POST['sal'];
         $uname="iam_".$fname;
         $query="INSERT INTO users(
-        user_type_id, full_name, username, password, status, employee_id,last_login_time)
-        VALUES ('$user_type_id', '$fname', '$uname', '$pass', '$status', '$empid',NOW());";
-        $query2="UPDATE employees
-        SET  status='1',salary='$salary'
-        WHERE employee_id='$id';";
-        $res=pg_query($dbconn,$query);
-        $res2=pg_query($dbconn,$query2);
+        user_type_id, full_name, username, password, status, employee_id,updated_at,created_at)
+        VALUES ($1, $2, $3, $4, $5, $6,NOW(),NOW());";
+        $params1=[$user_type_id,$fname,$uname,$hashedPassword,$status,$empid];
+        $query2 = "UPDATE employees 
+        SET status = $1, salary = $2 
+        WHERE employee_id = $3;";
+$params2 = [1, $salary, $id];
+$res2 = pg_query_params($dbconn, $query2, $params2);
+
+        $res=pg_query_params($dbconn,$query,$params1);
+        //$res2=pg_query($dbconn,$query2,$params2);
         if ($res && $res2) {
             $alertMessage = "Record Updation Successful";
             $alertType = "success";
@@ -54,11 +75,12 @@ if(isset($_POST['btn'])){
             $alertType = "danger";
         }
     }
-    
-    }
     else{
         echo"Try again";
     }
+    
+    }
+    
 //have to update the salary also then add login functionality from users side hve to provide file validation
 ?>
 <!doctype html>
@@ -85,13 +107,22 @@ if(isset($_POST['btn'])){
           <a class="nav-link" aria-current="page" href="registration.php" class="fw-bold ">Registration</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="login.php">Admin</a>
+          <a class="nav-link active" href="login.php">Login</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="dashboard.php">DashBoard</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="display.php">Admin Section</a>
+        </li>
+       <!-- <li class="nav-item">
           <a class="nav-link" href="check.php">User</a>
+        </li>-->
+       <!-- <li class="nav-item">
+          <a class="nav-link" href="user-login.php">User login</a>
+        </li>-->
+        <li class="nav-item">
+          <a class="nav-link" href="logout.php">Logout</a>
         </li>
       </ul>
     </div>
@@ -141,14 +172,14 @@ if(isset($_POST['btn'])){
                 <div class="col">
                     <div class="mb-3">
                         <label for="" class="form-label">Enter Password</label>
-                        <input type="password" class="form-control" name="pass" value="<?= isset($_POST['pass']) ? htmlspecialchars($_POST['pass']) : '' ?>">
+                        <input type="password" class="form-control" name="pass" value="<?= isset($_POST['pass']) ? $_POST['pass'] : '' ?>">
                         <span class="error">* <?php echo $passerr; ?> </span> 
                     </div>
                 </div>
                 <div class="col">
                     <div class="mb-3">
                         <label for="" class="form-label">Enter Salary</label>
-                        <input type="text" class="form-control" name="sal" value="<?= isset($_POST['sal']) ? htmlspecialchars($_POST['sal']) : '' ?>">
+                        <input type="text" class="form-control" name="sal" value="<?= isset($_POST['sal']) ? htmlspecialchars(trim($_POST['sal']), ENT_QUOTES, 'UTF-8') : '' ?>">
                         <span class="error">* <?php echo $salerr; ?> </span> 
                     </div>
                 </div>
