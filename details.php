@@ -45,8 +45,12 @@ if(!isset($_SESSION['uid'])){
 </html>
 <?php
 include 'includes/config.php';
+$id="";
+if(isset($_GET['url-id'])){
+  $id=$_GET['id'];
+}
 //$id=$_GET['id'];
-$id = $_SESSION['employee_id'];
+//$id = $_SESSION['employee_id'];
 $query="SELECT * FROM employees WHERE employee_id=$1;";
 $params=[$id];
 $res=pg_query_params($dbconn,$query,$params);

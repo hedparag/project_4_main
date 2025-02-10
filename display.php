@@ -66,21 +66,25 @@ if($total>0){
         <?php
         //htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8');
     while($rows=pg_fetch_assoc($res)){
-      $_SESSION['employee_id'] = $rows['employee_id'];
+      //$_SESSION['employee_id'] = $rows['employee_id'];
         echo"<tr><td>".htmlspecialchars($rows['employee_name'], ENT_QUOTES, 'UTF-8')."</td>
         <td>".htmlspecialchars($rows['employee_email'], ENT_QUOTES, 'UTF-8')."</td>
         <td>".htmlspecialchars($rows['employee_phone'], ENT_QUOTES, 'UTF-8')."</td>
         <td>".htmlspecialchars($rows['dob'], ENT_QUOTES, 'UTF-8')."</td>
         <td>
-                <a href='modification.php'>
-                    <button type='button' class='btn btn-success'>Approve</button>
-                </a>
-                <a href='delete.php'>
-                    <button type='button' class='btn btn-danger'>Delete</button>
-                </a>
-                <a href='details.php'>
-                    <button type='button' class='btn btn-primary'>Details</button>
-                </a>
+                 <form action='modification.php' method='GET'>
+   <input type='hidden' name='id' value='" . $rows['employee_id'] . "'>
+    <button type='submit' class='btn btn-success' name='url-id'>Approve</button>
+</form>
+
+                  <form action='delete.php' method='GET'>
+   <input type='hidden' name='id' value='" . $rows['employee_id'] . "'>
+    <button type='submit' class='btn btn-danger' name='url-id'>Delete</button>
+</form>
+                 <form action='details.php' method='GET'>
+   <input type='hidden' name='id' value='" . $rows['employee_id'] . "'>
+    <button type='submit' class='btn btn-primary' name='url-id'>Details</button>
+</form>
             </td>
           </tr>";
      }

@@ -1,6 +1,11 @@
 <?php
 include 'includes/config.php';
 session_start();
+$id="";
+if(isset($_GET['url-id'])){
+  $id=$_GET['id'];
+}
+
 if(!isset($_SESSION['uid'])){
     header("Location:login.php");
 }
@@ -17,7 +22,7 @@ function input_data($data)
 $passerr = "";
 $salerr="";
 //$id = $_GET['id'];
-$id = $_SESSION['employee_id'];
+//$id = $_SESSION['employee_id'];
 $query = "SELECT * FROM employees WHERE employee_id = $1;";
 $params=[$id];
 $res = pg_query_params($dbconn, $query,$params);
