@@ -21,6 +21,7 @@ function input_data($data)
 }
 $passerr = "";
 $salerr="";
+$unameerr="";
 //$id = $_GET['id'];
 //$id = $_SESSION['employee_id'];
 $query = "SELECT * FROM employees WHERE employee_id = $1;";
@@ -44,13 +45,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $pass = $_POST['pass'];
         $hashedPassword = password_hash($pass, PASSWORD_BCRYPT);   
     }
+    if (empty($_POST['uname'])) {  
+        $unameerr = "User name is required";  
+    } 
+    else {  
+        $uname = $_POST['uname'];
+        //$hashedPassword = password_hash($pass, PASSWORD_BCRYPT);   
+    }
 }
+
 ?>
 <?php
 $alertMessage = '';
 $alertType = '';
 if(isset($_POST['btn'])){
-    if($salerr=="" && $passerr==""){
+    if($salerr=="" && $passerr=="" && $unameerr==""){
         //$pass=$_POST['pass'];
         //$pass=bin2hex(random_bytes(6));
        // $hashedPassword = password_hash($pass, PASSWORD_BCRYPT);
@@ -58,12 +67,13 @@ if(isset($_POST['btn'])){
         $status=1;
         $user_type_id=$row['user_type_id'];
         $empid=$id;
+        $username=$uname;
         $salary=$_POST['sal'];
-        $uname="iam_".$fname;
+        //$uname="iam_".$fname;
         $query="INSERT INTO users(
         user_type_id, full_name, username, password, status, employee_id,updated_at,created_at)
         VALUES ($1, $2, $3, $4, $5, $6,NOW(),NOW());";
-        $params1=[$user_type_id,$fname,$uname,$hashedPassword,$status,$empid];
+        $params1=[$user_type_id,$fname,$username,$hashedPassword,$status,$empid];
         $query2 = "UPDATE employees 
         SET status = $1, salary = $2 
         WHERE employee_id = $3;";
@@ -115,11 +125,14 @@ $res2 = pg_query_params($dbconn, $query2, $params2);
           <a class="nav-link active" href="login.php">Login</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="dashboard.php">DashBoard</a>
+          <a class="nav-link" href="modified-dashboard.php">DashBoard</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="display.php">Admin Section</a>
         </li>
+        <li class="nav-item">
+              <a class="nav-link" href="modify-user.php">Edit</a>
+            </li>
        <!-- <li class="nav-item">
           <a class="nav-link" href="check.php">User</a>
         </li>-->
@@ -186,6 +199,13 @@ $res2 = pg_query_params($dbconn, $query2, $params2);
                         <label for="" class="form-label">Enter Salary</label>
                         <input type="text" class="form-control" name="sal" value="<?= isset($_POST['sal']) ? htmlspecialchars(trim($_POST['sal']), ENT_QUOTES, 'UTF-8') : '' ?>">
                         <span class="error">* <?php echo $salerr; ?> </span> 
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="mb-3">
+                        <label for="" class="form-label">Enter Username</label>
+                        <input type="text" class="form-control" name="uname" value="<?= isset($_POST['uname']) ? htmlspecialchars(trim($_POST['uname']), ENT_QUOTES, 'UTF-8') : '' ?>">
+                        <span class="error">* <?php echo $unameerr; ?> </span> 
                     </div>
                 </div>
             </div>

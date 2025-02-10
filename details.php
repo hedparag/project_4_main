@@ -25,16 +25,19 @@ if(!isset($_SESSION['uid'])){
           <a class="nav-link" aria-current="page" href="registration.php" class="fw-bold ">Registration</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="login.php">Admin</a>
+          <a class="nav-link" href="login.php">Login</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="dashboard.php">DashBoard</a>
+          <a class="nav-link" href="modified-dashboard.php">DashBoard</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="display.php">Admin Section</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="check.php">User</a>
+              <a class="nav-link" href="modify-user.php">Edit</a>
+            </li>
+        <li class="nav-item">
+          <a class="nav-link" href="logout.php">Logout</a>
         </li>
       </ul>
     </div>
@@ -49,8 +52,6 @@ $id="";
 if(isset($_GET['url-id'])){
   $id=$_GET['id'];
 }
-//$id=$_GET['id'];
-//$id = $_SESSION['employee_id'];
 $query="SELECT * FROM employees WHERE employee_id=$1;";
 $params=[$id];
 $res=pg_query_params($dbconn,$query,$params);
@@ -73,43 +74,56 @@ $params_type=[$row['user_type_id']];
 $res_type=pg_query_params($dbconn,$query_type,$params_type);
 $result_type=pg_fetch_assoc($res_type);
 $type=$result_type['user_type'];
-
-//$total=pg_num_rows($res);
-//if($total>0){
-    ?>
-
-    <h2 class="text-danger text-center mb-2">All The Records Are Following</h2>
-    <table class="table table-bordered table-primary table-hover  border-primary">
-      <tr><th>Employee Name</th>
-        <th>Employee Email</th>
-        <th>Employee Phone Number</th>
-        <th>Employee Date of Birth</th>
-        <th>Employee Details</th>
-        <th>Created At</th>
-        <th>Updated At</th>
-        <th>Status</th>
-        <th>Skill</th>
-        <th>Position</th>
-        <th>Department</th>
-        <th>User Type</th></tr>
-        <?php
-        echo"<tr><td>".htmlspecialchars($row['employee_name'], ENT_QUOTES, 'UTF-8')."</td>
-        <td>".htmlspecialchars($row['employee_email'], ENT_QUOTES, 'UTF-8')."</td>
-        <td>".htmlspecialchars($row['employee_phone'], ENT_QUOTES, 'UTF-8')."</td>
-        <td>".htmlspecialchars($row['dob'], ENT_QUOTES, 'UTF-8')."</td>
-        <td>".htmlspecialchars($row['employee_details'], ENT_QUOTES, 'UTF-8')."</td>
-        <td>".htmlspecialchars($row['created_at'], ENT_QUOTES, 'UTF-8')."</td>
-        <td>".htmlspecialchars($row['updated_at'], ENT_QUOTES, 'UTF-8')."</td>
-        <td> Not Approved</td>
-        <td>".htmlspecialchars($row['skills'], ENT_QUOTES, 'UTF-8')."</td>
-        <td>".htmlspecialchars($position, ENT_QUOTES, 'UTF-8')."</td>
-        <td>".htmlspecialchars($department, ENT_QUOTES, 'UTF-8')."</td>
-        <td>".htmlspecialchars($type, ENT_QUOTES, 'UTF-8')."</td>
-          </tr>";
-     
-     ?></table>
-     <?php
-
-//chaged condition
-
 ?>
+
+<h2 class="text-danger text-center mb-2">All The Records Are Following</h2>
+<table class="table table-bordered table-primary table-hover border-primary">
+    <tr>
+        <th>Employee Name</th>
+        <td><?php echo htmlspecialchars($row['employee_name'], ENT_QUOTES, 'UTF-8'); ?></td>
+    </tr>
+    <tr>
+        <th>Employee Email</th>
+        <td><?php echo htmlspecialchars($row['employee_email'], ENT_QUOTES, 'UTF-8'); ?></td>
+    </tr>
+    <tr>
+        <th>Employee Phone Number</th>
+        <td><?php echo htmlspecialchars($row['employee_phone'], ENT_QUOTES, 'UTF-8'); ?></td>
+    </tr>
+    <tr>
+        <th>Employee Date of Birth</th>
+        <td><?php echo htmlspecialchars($row['dob'], ENT_QUOTES, 'UTF-8'); ?></td>
+    </tr>
+    <tr>
+        <th>Employee Details</th>
+        <td><?php echo htmlspecialchars($row['employee_details'], ENT_QUOTES, 'UTF-8'); ?></td>
+    </tr>
+    <tr>
+        <th>Created At</th>
+        <td><?php echo htmlspecialchars($row['created_at'], ENT_QUOTES, 'UTF-8'); ?></td>
+    </tr>
+    <tr>
+        <th>Updated At</th>
+        <td><?php echo htmlspecialchars($row['updated_at'], ENT_QUOTES, 'UTF-8'); ?></td>
+    </tr>
+    <tr>
+        <th>Status</th>
+        <td>Not Approved</td>
+    </tr>
+    <tr>
+        <th>Skill</th>
+        <td><?php echo htmlspecialchars($row['skills'], ENT_QUOTES, 'UTF-8'); ?></td>
+    </tr>
+    <tr>
+        <th>Position</th>
+        <td><?php echo htmlspecialchars($position, ENT_QUOTES, 'UTF-8'); ?></td>
+    </tr>
+    <tr>
+        <th>Department</th>
+        <td><?php echo htmlspecialchars($department, ENT_QUOTES, 'UTF-8'); ?></td>
+    </tr>
+    <tr>
+        <th>User Type</th>
+        <td><?php echo htmlspecialchars($type, ENT_QUOTES, 'UTF-8'); ?></td>
+    </tr>
+</table>

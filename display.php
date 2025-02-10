@@ -28,11 +28,14 @@ if(!isset($_SESSION['uid'])){
           <a class="nav-link active" href="login.php">Login</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="dashboard.php">DashBoard</a>
+          <a class="nav-link" href="modified-dashboard.php">DashBoard</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="display.php">Admin Section</a>
         </li>
+        <li class="nav-item">
+              <a class="nav-link" href="modify-user.php">Edit</a>
+            </li>
        <!-- <li class="nav-item">
           <a class="nav-link" href="check.php">User</a>
         </li>-->

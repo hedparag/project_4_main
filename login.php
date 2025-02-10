@@ -3,6 +3,13 @@
 // admin anita 6789 ishita pass-ishita user
 include 'includes/config.php';
 session_start();
+if(isset($_SESSION['uid'])){
+  header("Location:display.php");
+}
+if(isset($_SESSION['stay'])){
+  header("Location:modified-dashboard.php");
+
+}
 function input_data($data)
 {
     // trim() is used to remove any trailing whitespace
@@ -13,16 +20,16 @@ function input_data($data)
     $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
     return $data;
 }
-$passErr = $emailErr ="";
+$passErr = $unameErr ="";
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-if (empty($_POST['aemail'])) {  
-  $emailErr = "email is required";  
+if (empty($_POST['uname'])) {  
+  $unameErr = "User name is required";  
 }
 else {  
-$email = input_data($_POST['aemail']); 
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {  
+$uname = input_data($_POST['uname']); 
+/*if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {  
   $emailErr = "Invalid email format";  
-} 
+} */
 }
 if (empty($_POST['apass'])) {  
   $passErr = "Password is required";  
@@ -60,7 +67,10 @@ $pass =$_POST['apass'];
           <a class="nav-link" href="display.php">Admin Section</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="dashboard.php">DashBoard</a>
+          <a class="nav-link" href="modified-dashboard.php">DashBoard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="modify-user.php">Edit</a>
         </li>
        <!-- <li class="nav-item">
           <a class="nav-link" href="check.php">User</a>
@@ -79,9 +89,9 @@ $pass =$_POST['apass'];
     <h1 class="text-danger mb-3 fw-bold">Fill Out The Login Form</h1>
   <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="border-2 bg-info p-4">
   <div class="mb-3">
-    <label for="exampleInputEmail1" class="form-label">Email address</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="aemail" value="<?= isset($_POST['aemail']) ? htmlspecialchars(trim($_POST['aemail']), ENT_QUOTES, 'UTF-8') : '' ?>">
-    <span class="error">* <?php echo $emailErr; ?> </span>
+    <label for="exampleInputEmail1" class="form-label">User Name</label>
+    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="uname" value="<?= isset($_POST['uname']) ? htmlspecialchars(trim($_POST['uname']), ENT_QUOTES, 'UTF-8') : '' ?>">
+    <span class="error">* <?php echo $unameErr; ?> </span>
   </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">Password</label>
@@ -96,26 +106,30 @@ $pass =$_POST['apass'];
 </html>
 <?php
 if(isset($_POST['btn'])){
-  if($passErr == "" && $emailErr == ""){
-    $query = "SELECT * FROM employees WHERE employee_email = $1  AND status = $2 AND user_type_id = $3;";
+  if($passErr == "" && $unameErr == ""){
+    /*$query = "SELECT * FROM employees WHERE employee_email = $1  AND status = $2 AND user_type_id = $3;";
     $params = [$email, '1', 1];
     $result = pg_query_params($dbconn, $query, $params);
  $total=pg_num_rows($result);
  if($total>0)  { //valid admin
      $row=pg_fetch_assoc($result);  
-     $id1=$row['employee_id'];
-  $query2 = "SELECT * FROM users WHERE employee_id = $1  AND  user_type_id = $2;";
-    $params2 = [$id1, 1];
+     $id1=$row['employee_id'];*/
+
+  $query2 = "SELECT * FROM users WHERE username = $1  AND  user_type_id = $2;";
+    $params2 = [$uname, 1];
     $result2 = pg_query_params($dbconn, $query2, $params2);
     $total2=pg_num_rows($result2);
     if($total2==1){
       $row1=pg_fetch_assoc($result2);
+      $emp_id=$row1['employee_id'];
       $storedpass=$row1['password'];
       if (password_verify($pass, $storedpass)) {
-        $_SESSION["id"] = "$id1";
-        $_SESSION["uid"] = "$id1";
+        $_SESSION["id"] = $emp_id;
+        $_SESSION["uid"] = $emp_id;
+        $_SESSION['uname']=$uname;
+        $_SESSION['user-type']=1;
         $time = "UPDATE users SET last_login_time = NOW() WHERE employee_id = $1";
-        pg_query_params($dbconn, $time, [$id1]);
+        pg_query_params($dbconn, $time, [$emp_id]);
         
         header("Location:display.php");
     }
@@ -124,43 +138,44 @@ if(isset($_POST['btn'])){
     }
       
     }
- 
- } 
- else{//user login
-  $query3 = "SELECT * FROM employees WHERE employee_email = $1  AND status = $2 AND user_type_id = $3;";
+ else
+ {//user login
+  /*$query3 = "SELECT * FROM employees WHERE employee_email = $1  AND status = $2 AND user_type_id = $3;";
     $params3 = [$email, '1', 2];
     $result3 = pg_query_params($dbconn, $query3, $params3);
  $total3=pg_num_rows($result3);
  if($total3>0)  { //valid user
   
   $row3=pg_fetch_assoc($result3);
-  $id2=$row3['employee_id'];  
-  $query4 = "SELECT * FROM users WHERE employee_id = $1  AND user_type_id = $2;";
-    $params4 = [$id2, 2];
+  $id2=$row3['employee_id']; */ 
+  $query4 = "SELECT * FROM users WHERE username = $1  AND user_type_id = $2;";
+    $params4 = [$uname, 2];
     $result4 = pg_query_params($dbconn, $query4, $params4);
     $total4=pg_num_rows($result4);
     if($total4==1){
 
     $row2=pg_fetch_assoc($result4);
+    $emp_id2=$row2['employee_id'];
       $storedpass=$row2['password'];
       if (password_verify($pass, $storedpass)) {
-        $_SESSION["id"] = "$id2";
+        $_SESSION["id"] = $emp_id2;
+        $_SESSION["stay"]=$emp_id2;
+        $_SESSION['uname']=$uname;
+        $_SESSION['user-type']=2;
         $time = "UPDATE users SET last_login_time = NOW() WHERE employee_id = $1";
-        pg_query_params($dbconn, $time, [$id2]);
+        pg_query_params($dbconn, $time, [$emp_id2]);
         
-        header("Location:dashboard.php");//user dashboard
+        header("Location:modified-dashboard.php");//user dashboard
     }
     else{
       echo"You enter wrong password";
     }
  }
-
-
- 
-}
-else{
+ else{
   echo"You are not valid user and admin";
  }
+}
+
 
 
    /* if( $_POST['aemail']=="admin@gmail.com" && $_POST['apass']=="admin" ){
@@ -173,10 +188,10 @@ else{
   
   
 }
-
-}
 else{
   echo"modify";
 }
+
 }
+
 ?>
