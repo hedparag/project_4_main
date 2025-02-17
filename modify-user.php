@@ -17,7 +17,10 @@ function input_data($data) {
     $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
     return $data;
 }
-
+$query = "SELECT * FROM employees WHERE employee_id=$1;";
+$param = [$id];
+$res = pg_query_params($dbconn, $query, $param);
+$row = pg_fetch_assoc($res);
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $phone = $dob = $details = "";
 
@@ -62,23 +65,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $res1 = pg_query_params($dbconn, $update1, $param2);
 
         if ($res && $res1) {
-            echo "Record Updated";
+            //echo "Record Updated";
             // Reload form with updated values from the database
+            ?>    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-body">
+                   Updation Successful
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var toastElement = document.querySelector(".toast");
+                var toast = new bootstrap.Toast(toastElement);
+                toast.show();
+            });
+        </script>
+            <?php
             $query = "SELECT * FROM employees WHERE employee_id=$1;";
             $param = [$id];
             $res = pg_query_params($dbconn, $query, $param);
             $row = pg_fetch_assoc($res);
         } else {
-            echo "Error occurred while updating data.";
+           // echo "Error occurred while updating data.";
+           ?>    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+           <div class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+               <div class="toast-body">
+                   Error Occured
+               </div>
+           </div>
+       </div>
+       <script>
+           document.addEventListener("DOMContentLoaded", function () {
+               var toastElement = document.querySelector(".toast");
+               var toast = new bootstrap.Toast(toastElement);
+               toast.show();
+           });
+       </script>
+       <?php
         }
     }
-} else {
+} 
+/*else {
     // Load initial form data
     $query = "SELECT * FROM employees WHERE employee_id=$1;";
     $param = [$id];
     $res = pg_query_params($dbconn, $query, $param);
     $row = pg_fetch_assoc($res);
-}
+}*/
 ?>
 <!doctype html>
 <html lang="en">
@@ -155,6 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           </div>
         </div>
       </div>
+      
       <div class="row">
         <div class="form-floating">
           <textarea class="form-control" placeholder="Enter your details from here..." name="details" style="height: 100px"><?php echo $row['employee_details']; ?></textarea>

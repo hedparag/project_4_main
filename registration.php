@@ -463,9 +463,45 @@ if (strlen ($phone) != 10) {
         $result = pg_query_params($dbconn, $query,$params1);
         
             if ($result) {
-                echo "User registered successfully!";
+                //echo "User registered successfully!";
+                ?>
+               <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body">
+                Registration Successful
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var toastElement = document.querySelector(".toast");
+            var toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        });
+    </script>
+  
+            <?php
             } else {
-                echo "Error in registration: " . pg_last_error($dbconn);
+                //echo "Error in registration: " . pg_last_error($dbconn);
+                ?>
+                
+                <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-body">
+                        Registration Unsuccessful
+                    </div>
+                </div>
+            </div>
+             
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var toastElement = document.querySelector(".toast");
+            var toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        });
+    </script>
+            
+            <?php
             }
     }
     else{
