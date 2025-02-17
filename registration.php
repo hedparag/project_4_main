@@ -486,7 +486,7 @@ if (strlen ($phone) != 10) {
                 ?>
                 
                 <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                <div class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="toast-body">
                         Registration Unsuccessful
                     </div>

@@ -1,14 +1,35 @@
 <?php
 include 'includes/config.php';
 session_start();
-$id="";
-if(isset($_GET['url-id'])){
-  $id=$_GET['id'];
-}
 
+/*if(isset($_GET['url-id'])){
+  $id=$_GET['id'];
+}*/
 if(!isset($_SESSION['uid'])){
     header("Location:login.php");
 }
+$id="";
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    if(!ctype_digit($id)){
+        die("<h2>Invalid</h2>");
+    }
+} /*else {
+    
+}*/
+
+// Query to check if the ID exists in the database
+$query = "SELECT * FROM employees WHERE employee_id = $1;";
+$params = [$id];
+$res = pg_query_params($dbconn, $query, $params);
+
+if (!$res || pg_num_rows($res) === 0) {
+    die("<h2>Not Found</h2>");
+}
+
+$row = pg_fetch_assoc($res);
+
+
 function input_data($data)
 {
     // trim() is used to remove any trailing whitespace
@@ -24,10 +45,10 @@ $salerr="";
 $unameerr="";
 //$id = $_GET['id'];
 //$id = $_SESSION['employee_id'];
-$query = "SELECT * FROM employees WHERE employee_id = $1;";
+/*$query = "SELECT * FROM employees WHERE employee_id = $1;";
 $params=[$id];
 $res = pg_query_params($dbconn, $query,$params);
-$row = pg_fetch_assoc($res);
+$row = pg_fetch_assoc($res);*/
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($_POST['sal'])) {  

@@ -49,13 +49,33 @@ if(!isset($_SESSION['uid'])){
 <?php
 include 'includes/config.php';
 $id="";
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    if(!ctype_digit($id)){
+        die("<h2>Invalid</h2>");
+    }
+} /*else {
+    
+}*/
+
+// Query to check if the ID exists in the database
+$query = "SELECT * FROM employees WHERE employee_id = $1;";
+$params = [$id];
+$res = pg_query_params($dbconn, $query, $params);
+
+if (!$res || pg_num_rows($res) === 0) {
+    die("<h2>Not Found</h2>");
+}
+
+$row = pg_fetch_assoc($res);
+/*$id="";
 if(isset($_GET['url-id'])){
   $id=$_GET['id'];
 }
 $query="SELECT * FROM employees WHERE employee_id=$1;";
 $params=[$id];
 $res=pg_query_params($dbconn,$query,$params);
-$row=pg_fetch_assoc($res);
+$row=pg_fetch_assoc($res);*/
 
 $query_pos = "SELECT * FROM positions WHERE position_id= $1;";
 $params_pos=[$row['position_id']];

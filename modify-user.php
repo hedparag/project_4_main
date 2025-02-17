@@ -1,6 +1,7 @@
 <?php
 include 'includes/config.php';
-$emailErr = $mobilenoErr = $dobErr = "";
+$emailErr = $mobilenoErr = $dobErr =$passErr = "";
+$hashedPassword = null;
 session_start();
 $id = "";
 
@@ -21,6 +22,11 @@ $query = "SELECT * FROM employees WHERE employee_id=$1;";
 $param = [$id];
 $res = pg_query_params($dbconn, $query, $param);
 $row = pg_fetch_assoc($res);
+
+$query1 = "SELECT * FROM users WHERE employee_id=$1;";
+$param1 = [$id];
+$res1 = pg_query_params($dbconn, $query1, $param1);
+$row1 = pg_fetch_assoc($res1);
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $phone = $dob = $details = "";
 
@@ -39,6 +45,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $emailErr = "Invalid email format";
         }
     }
+   /* if (empty($_POST['pass']) && empty($_POST['cpass'])) {
+      $passErr = "Password is required";
+  } */
+  if (!empty($_POST["pass"]) || !empty($_POST["cpass"])) {  
+    if (empty($_POST["pass"])) {
+        $passErr = "Password cannot be empty if confirm password is provided";
+    } elseif (empty($_POST["cpass"])) {
+        $passErr = "Confirm password cannot be empty if password is provided";
+    } elseif ($_POST["pass"] !== $_POST["cpass"]) {
+        $passErr = "Passwords do not match";
+    } else {
+        $pass = $_POST["cpass"];
+        $hashedPassword = password_hash($pass, PASSWORD_BCRYPT);
+    }
+}
 
     if (empty($_POST['phone'])) {
         $mobilenoErr = "Mobile no is required";
@@ -53,16 +74,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $details = input_data($_POST['details']);
 
-    if (empty($emailErr) && empty($mobilenoErr) && empty($dobErr)) {
+    if (empty($emailErr) && empty($mobilenoErr) && empty($dobErr) && empty($passErr)) {
         // Update query for employees
         $update = "UPDATE employees SET employee_email=$1, employee_phone=$2, dob=$3, updated_at=NOW(), employee_details=$4 WHERE employee_id=$5;";
         $param1 = [$email, $phone, $dob, $details, $id];
         $res = pg_query_params($dbconn, $update, $param1);
 
         // Update query for users
-        $update1 = "UPDATE users SET updated_at=NOW() WHERE employee_id=$1;";
-        $param2 = [$id];
-        $res1 = pg_query_params($dbconn, $update1, $param2);
+       /* $update1 = "UPDATE users SET updated_at=NOW(),password=$1 WHERE employee_id=$2;";
+        $param2 = [$hashedPassword,$id];
+        $res1 = pg_query_params($dbconn, $update1, $param2);*/
+        if ($hashedPassword !== null) {
+          $update1 = "UPDATE users SET updated_at=NOW(), password=$1 WHERE employee_id=$2;";
+          $param2 = [$hashedPassword, $id];
+          $res1 = pg_query_params($dbconn, $update1, $param2);
+      } else {
+          // Update only the timestamp if password is not changed
+          $update1 = "UPDATE users SET updated_at=NOW() WHERE employee_id=$1;";
+          $param2 = [$id];
+          $res1 = pg_query_params($dbconn, $update1, $param2);
+      }
 
         if ($res && $res1) {
             //echo "Record Updated";
@@ -89,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
            // echo "Error occurred while updating data.";
            ?>    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-           <div class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+           <div class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
                <div class="toast-body">
                    Error Occured
                </div>
@@ -186,6 +217,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label class="form-label">Date Of Birth</label>
             <input type="date" class="form-control" name="dob" value="<?php echo $row['dob']; ?>">
             <span class="error">*<?php echo $dobErr; ?> </span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" name="pass" value="<?= isset($_POST['pass']) ? $_POST['pass'] : '' ?>">
+            <span class="error"><?php echo $passErr; ?> </span>
+          </div>
+        </div>
+        <div class="col">
+          <div class="mb-3">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" class="form-control" name="cpass" value="<?= isset($_POST['cpass']) ? $_POST['cpass'] : '' ?>">
+            <span class="error"><?php echo $passErr; ?> </span>
           </div>
         </div>
       </div>

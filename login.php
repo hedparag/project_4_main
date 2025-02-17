@@ -1,6 +1,8 @@
 <?php
 //admin 1234 user 12345
 // admin anita 6789 ishita pass-ishita user
+//dipa admin password-dipa
+//user ayudh password-ayudh user anta@das antaritadas
 include 'includes/config.php';
 session_start();
 if(isset($_SESSION['uid'])){

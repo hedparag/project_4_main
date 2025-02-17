@@ -77,16 +77,16 @@ if($total>0){
         <td>
                  <form action='modification.php' method='GET'>
    <input type='hidden' name='id' value='" . $rows['employee_id'] . "'>
-    <button type='submit' class='btn btn-success' name='url-id'>Approve</button>
+    <button type='submit' class='btn btn-success'>Approve</button>
 </form>
 
                   <form action='delete.php' method='GET'>
    <input type='hidden' name='id' value='" . $rows['employee_id'] . "'>
-    <button type='submit' class='btn btn-danger' name='url-id'>Delete</button>
+    <button type='submit' class='btn btn-danger'>Delete</button>
 </form>
                  <form action='details.php' method='GET'>
    <input type='hidden' name='id' value='" . $rows['employee_id'] . "'>
-    <button type='submit' class='btn btn-primary' name='url-id'>Details</button>
+    <button type='submit' class='btn btn-primary'>Details</button>
 </form>
             </td>
           </tr>";
