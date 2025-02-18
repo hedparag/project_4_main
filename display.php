@@ -3,6 +3,18 @@ session_start();
 if(!isset($_SESSION['uid'])){
     header("Location:login.php");
 }
+/*if (!$_GET["tokenid"] == $_SESSION["csrf_token"]) {
+  header("Location:login.php");
+}*/
+/*if (isset($_GET['tokenid'])) {
+  $csrf_token = urldecode($_GET['tokenid']);  // Decode to get the original value
+  if (!$csrf_token == $_SESSION["csrf_token"]) {
+    header("Location:login.php");
+}
+}
+else{
+  header("Location:login.php");
+}*/
 ?>
 <!doctype html>
 <html lang="en">

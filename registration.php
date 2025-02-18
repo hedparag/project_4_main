@@ -71,7 +71,7 @@ if (empty($_FILES['img']['name'])) {
     } else {
         $imgPath = "uploads/" . basename($_FILES['img']['name']);
         if (move_uploaded_file($_FILES['img']['tmp_name'], $imgPath)) {
-            echo "Image uploaded successfully: " . $imgPath;
+            //echo "Image uploaded successfully: " . $imgPath;
         } else {
             $uploadErr = "Error uploading the image.";
         }
@@ -146,9 +146,6 @@ $details=input_data($_POST['details']);
        <!-- <li class="nav-item">
           <a class="nav-link" href="user-login.php">User login</a>
         </li>-->
-        <li class="nav-item">
-          <a class="nav-link" href="logout.php">Logout</a>
-        </li>
       </ul>
     </div>
   </div>
@@ -505,7 +502,20 @@ if (strlen ($phone) != 10) {
             }
     }
     else{
-        echo"record already exists";
+       ?><div class="toast-container position-fixed bottom-0 end-0 p-3">
+       <div class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+           <div class="toast-body">
+              Record already exists
+           </div>
+       </div>
+     </div>
+     <script>
+       document.addEventListener("DOMContentLoaded", function () {
+           var toastElement = document.querySelector(".toast");
+           var toast = new bootstrap.Toast(toastElement);
+           toast.show();
+       });
+     </script><?php
     }
     
     
